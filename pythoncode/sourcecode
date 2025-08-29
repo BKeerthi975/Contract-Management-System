@@ -1,1 +1,174 @@
+class Contract:
+    def __init__(self, contract_id, project_name, start_date, end_date, amount):
+        self.contract_id = contract_id
+        self.project_name = project_name
+        self.start_date = start_date
+        self.end_date = end_date
+        self.amount = amount
+
+    def display_contract(self):
+        print(f"Contract ID: {self.contract_id}")
+        print(f"Project Name: {self.project_name}")
+        print(f"Start Date: {self.start_date}")
+        print(f"End Date: {self.end_date}")
+        print(f"Amount: ${self.amount}")
+
+
+class ProjectContract(Contract):
+    def __init__(self, contract_id, project_name, start_date, end_date, amount, project_manager):
+        super().__init__(contract_id, project_name, start_date, end_date, amount)
+        self.project_manager = project_manager
+
+    def display_contract(self):
+        super().display_contract()
+        print(f"Project Manager: {self.project_manager}")
+
+
+class ComplianceContract(Contract):
+    def __init__(self, contract_id, project_name, start_date, end_date, amount, compliance_status):
+        super().__init__(contract_id, project_name, start_date, end_date, amount)
+        self.compliance_status = compliance_status
+
+    def display_contract(self):
+        super().display_contract()
+        print(f"Compliance Status: {self.compliance_status}")
+
+
+class ContractManagementSystem:
+    def __init__(self):
+        self.contracts = {}
+
+    def add_contract(self, contract_id, project_name, start_date, end_date, amount, contract_type, **kwargs):
+        if contract_id not in self.contracts:
+            if contract_type == "project":
+                project_manager = kwargs.get('project_manager', 'Not specified')
+                contract = ProjectContract(contract_id, project_name, start_date, end_date, amount, project_manager)
+            elif contract_type == "compliance":
+                compliance_status = kwargs.get('compliance_status', 'Pending')
+                contract = ComplianceContract(contract_id, project_name, start_date, end_date, amount, compliance_status)
+            else:
+                contract = Contract(contract_id, project_name, start_date, end_date, amount)
+
+            self.contracts[contract_id] = contract
+            print(f"Contract {contract_id} added successfully.")
+        else:
+            print("Contract with the same ID already exists.")
+
+    def update_contract(self, contract_id, amount):
+        if contract_id in self.contracts:
+            self.contracts[contract_id].amount = amount
+            print(f"Contract {contract_id} updated successfully.")
+        else:
+            print("Contract not found.")
+
+    def delete_contract(self, contract_id):
+        if contract_id in self.contracts:
+            del self.contracts[contract_id]
+            print(f"Contract {contract_id} deleted successfully.")
+        else:
+            print("Contract not found.")
+
+    def manage_project_contracts(self, contract_id, project_manager):
+        if contract_id in self.contracts and isinstance(self.contracts[contract_id], ProjectContract):
+            self.contracts[contract_id].project_manager = project_manager
+            print(f"Project Manager for Contract {contract_id} updated successfully.")
+        else:
+            print("Contract not found or not a project contract.")
+
+    def track_contract_compliance(self, contract_id, compliance_status):
+        if contract_id in self.contracts and isinstance(self.contracts[contract_id], ComplianceContract):
+            self.contracts[contract_id].compliance_status = compliance_status
+            print(f"Compliance Status for Contract {contract_id} updated successfully.")
+        else:
+            print("Contract not found or not a compliance contract.")
+
+    def display_all_contracts(self):
+        if not self.contracts:
+            print("No contracts found.")
+        for contract in self.contracts.values():
+            contract.display_contract()
+            print("---------------")
+
+
+def authenticate_user():
+    valid_users = {"james": "123#45"}  # Example credentials
+    username = input("Enter username: ")
+    password = input("Enter password: ")
+    if username in valid_users and valid_users[username] == password:
+        print("Login successful!")
+        return True
+    else:
+        print("Login failed. Invalid username or password.")
+        return False
+
+
+def main():
+    if not authenticate_user():
+        print("Exiting...")
+        return
+
+    contract_system = ContractManagementSystem()
+
+    while True:
+        print("\nContract Management System Menu:")
+        print("1. Add Contract")
+        print("2. Update Contract Amount")
+        print("3. Delete Contract")
+        print("4. Manage Project Contracts")
+        print("5. Track Contract Compliance")
+        print("6. Display All Contracts")
+        print("7. Exit")
+
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            contract_id = input("Enter contract ID: ")
+            project_name = input("Enter project name: ")
+            start_date = input("Enter start date (YYYY-MM-DD): ")
+            end_date = input("Enter end date (YYYY-MM-DD): ")
+            amount = float(input("Enter contract amount: $"))
+            contract_type = input("Enter contract type (project/compliance/other): ")
+
+            if contract_type == "project":
+                project_manager = input("Enter project manager: ")
+                contract_system.add_contract(contract_id, project_name, start_date, end_date, amount,
+                                             contract_type, project_manager=project_manager)
+            elif contract_type == "compliance":
+                compliance_status = input("Enter compliance status: ")
+                contract_system.add_contract(contract_id, project_name, start_date, end_date, amount,
+                                             contract_type, compliance_status=compliance_status)
+            else:
+                contract_system.add_contract(contract_id, project_name, start_date, end_date, amount, contract_type)
+
+        elif choice == "2":
+            contract_id = input("Enter contract ID to update amount: ")
+            amount = float(input("Enter new amount: $"))
+            contract_system.update_contract(contract_id, amount)
+
+        elif choice == "3":
+            contract_id = input("Enter contract ID to delete: ")
+            contract_system.delete_contract(contract_id)
+
+        elif choice == "4":
+            contract_id = input("Enter contract ID to manage project: ")
+            project_manager = input("Enter new project manager: ")
+            contract_system.manage_project_contracts(contract_id, project_manager)
+
+        elif choice == "5":
+            contract_id = input("Enter contract ID to track compliance: ")
+            compliance_status = input("Enter new compliance status: ")
+            contract_system.track_contract_compliance(contract_id, compliance_status)
+
+        elif choice == "6":
+            contract_system.display_all_contracts()
+
+        elif choice == "7":
+            print("Exiting...")
+            break
+        else:
+            print("Invalid choice. Please choose again.")
+
+
+if __name__ == "__main__":
+    main()
 
